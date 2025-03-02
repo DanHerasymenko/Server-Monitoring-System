@@ -2,16 +2,54 @@ package logger
 
 import (
 	"context"
+	"fmt"
+	"github.com/natefinch/lumberjack"
+	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"sync"
+)
+
+var (
+	logFile *lumberjack.Logger
+	once    sync.Once
 )
 
 func init() {
-	h := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+
+	once.Do(func() {
+		// create log directory
+		logDir := "logs"
+		if err := os.MkdirAll(logDir, os.ModePerm); err != nil {
+			panic(fmt.Errorf("failed to create log directory: %w", err))
+			return
+		}
+
+		//log rotation
+		logFile = &lumberjack.Logger{
+			Filename:   filepath.Join(logDir, "monitoring_agent.log"),
+			MaxSize:    10,
+			MaxBackups: 3,
+			MaxAge:     7,
+			Compress:   true,
+		}
+
+		// init logger with JSON handler
+		// write to stdout and file
+		h := slog.NewJSONHandler(io.MultiWriter(os.Stdout, logFile), &slog.HandlerOptions{
+			Level: slog.LevelInfo,
+		})
+		l := slog.New(h)
+		slog.SetDefault(l)
+
 	})
-	l := slog.New(h)
-	slog.SetDefault(l)
+}
+
+func Close() {
+	if logFile != nil {
+		logFile.Close()
+	}
 }
 
 func Info(ctx context.Context, msg string, attrs ...slog.Attr) {

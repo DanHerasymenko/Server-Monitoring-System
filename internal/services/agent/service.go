@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/kardianos/service"
 	"log"
+	"os"
 )
 
 type Service struct {
@@ -16,8 +17,7 @@ type Service struct {
 	cancel  context.CancelFunc
 }
 
-func NewService(cfg *config.Config, ctx context.Context) *Service {
-	ctx, cancel := context.WithCancel(ctx)
+func NewService(cfg *config.Config, ctx context.Context, cancel context.CancelFunc) *Service {
 	return &Service{
 		cfg:     cfg,
 		context: ctx,
@@ -73,8 +73,8 @@ func (s *Service) RunAgentService() {
 	}
 
 	// service commands handling
-	if len(svcConfig.Arguments) > 1 {
-		switch svcConfig.Arguments[1] {
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
 		case "install":
 			err = svc.Install()
 			if err == nil {

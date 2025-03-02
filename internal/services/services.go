@@ -10,8 +10,8 @@ type Services struct {
 	Agent *agent.Service
 }
 
-func NewServices(cfg *config.Config, ctx context.Context) *Services {
+func NewServices(cfg *config.Config, ctx context.Context, cancel context.CancelFunc) *Services {
 	return &Services{
-		Agent: agent.NewService(cfg, ctx),
+		Agent: agent.NewService(cfg, ctx, cancel),
 	}
 }

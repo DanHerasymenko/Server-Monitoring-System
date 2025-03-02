@@ -10,13 +10,14 @@ import (
 
 func main() {
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 
 	cfg, err := config.NewConfigFromEnv(ctx)
 	if err != nil {
 		logger.Fatal(ctx, fmt.Errorf("failed to load config: %w", err))
 	}
 
-	svs := services.NewServices(cfg, ctx)
+	svs := services.NewServices(cfg, ctx, cancel)
+	defer logger.Close()
 	svs.Agent.RunAgentService()
 }
