@@ -1,21 +1,46 @@
 package config
 
 import (
+	"Server-Monitoring-System/internal/logger"
+	"Server-Monitoring-System/internal/utils"
+	"context"
 	"fmt"
 	"github.com/caarlos0/env/v11"
+	"log/slog"
 )
 
 type Config struct {
-	Env        string `env:"APP_ENV" envDefault:"local-local"`
-	ServerAddr string `env:"SERVER_ADDR" envDefault:"127.0.0.1"`
-	ServerPort string `env:"SERVER_ADDR" envDefault:":8082"`
+	Env        string `env:"APP_ENV" envDefault:"local"`
+	ServerIp   string `env:"SERVER_IP"`
+	ServerPort string `env:"SERVER_PORT" envDefault:"8082"`
+	AgentIP    string `env:"AGENT_IP"`
+	AgentPort  string `env:"AGENT_PORT" envDefault:"8080"`
 }
 
-func NewConfigFromEnv() (*Config, error) {
+func NewConfigFromEnv(ctx context.Context) (*Config, error) {
 	cfg := &Config{}
+
 	err := env.Parse(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse config from env: %w", err)
 	}
+
+	if cfg.AgentIP == "" {
+		cfg.AgentIP = utils.GetPublicIP(ctx)
+		logger.Info(ctx, "AgentIP is not set, using public IP",
+			slog.String("AgentIP", cfg.AgentIP))
+	}
+
+	if cfg.ServerIp == "" {
+		logger.Warn(ctx, "ServerIP is not set, can be issues with the server connection")
+	}
+
+	logger.Info(ctx, "config loaded",
+		slog.String("ServerIP", cfg.ServerIp),
+		slog.String("ServerPort", cfg.ServerPort),
+		slog.String("AgentIP", cfg.AgentIP),
+		slog.String("AgentPort", cfg.AgentPort),
+	)
+
 	return cfg, nil
 }
