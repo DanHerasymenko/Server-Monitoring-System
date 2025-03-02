@@ -10,11 +10,12 @@ import (
 )
 
 type Config struct {
-	Env        string `env:"APP_ENV" envDefault:"local"`
-	ServerIp   string `env:"SERVER_IP"`
-	ServerPort string `env:"SERVER_PORT" envDefault:"8082"`
-	AgentIP    string `env:"AGENT_IP"`
-	AgentPort  string `env:"AGENT_PORT" envDefault:"8080"`
+	Env                    string `env:"APP_ENV" envDefault:"local"`
+	ServerIP               string `env:"SERVER_IP"`
+	ServerPort             string `env:"SERVER_PORT" envDefault:"8082"`
+	AgentIP                string `env:"AGENT_IP"`
+	AgentPort              string `env:"AGENT_PORT" envDefault:"8080"`
+	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"5"`
 }
 
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {
@@ -31,15 +32,16 @@ func NewConfigFromEnv(ctx context.Context) (*Config, error) {
 			slog.String("AgentIP", cfg.AgentIP))
 	}
 
-	if cfg.ServerIp == "" {
+	if cfg.ServerIP == "" {
 		logger.Warn(ctx, "ServerIP is not set, can be issues with the server connection")
 	}
 
 	logger.Info(ctx, "config loaded",
-		slog.String("ServerIP", cfg.ServerIp),
+		slog.String("ServerIP", cfg.ServerIP),
 		slog.String("ServerPort", cfg.ServerPort),
 		slog.String("AgentIP", cfg.AgentIP),
 		slog.String("AgentPort", cfg.AgentPort),
+		slog.Int("CollectMetricsInterval", cfg.CollectMetricsInterval),
 	)
 
 	return cfg, nil

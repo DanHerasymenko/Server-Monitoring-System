@@ -2,6 +2,7 @@ package main
 
 import (
 	"Server-Monitoring-System/internal/config"
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,7 +12,9 @@ import (
 
 func main() {
 
-	cfg, err := config.NewConfigFromEnv()
+	ctx := context.Background()
+
+	cfg, err := config.NewConfigFromEnv(ctx)
 	if err != nil {
 		fmt.Println("failed to load config: %w", err)
 	}
