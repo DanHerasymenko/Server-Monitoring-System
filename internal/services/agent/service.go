@@ -75,6 +75,7 @@ func (s *Service) RunAgentService() {
 	// service commands handling
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
+		// installs as Windows service
 		case "install":
 			err = svc.Install()
 			if err == nil {
