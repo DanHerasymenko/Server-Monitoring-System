@@ -30,8 +30,6 @@ func (s *Service) CollectMetrics() {
 		slog.Float64("Disk", m.DiskUsage),
 	)
 
-	//interval between metrics collection
-	time.Sleep(time.Duration(s.cfg.CollectMetricsInterval))
 }
 
 func getMetrics() (*Metrics, error) {
@@ -59,4 +57,5 @@ func getMetrics() (*Metrics, error) {
 		DiskUsage: diskU.UsedPercent,
 		Timestamp: now,
 	}, nil
+
 }

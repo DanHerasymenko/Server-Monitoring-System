@@ -15,7 +15,7 @@ type Config struct {
 	ServerPort             string `env:"SERVER_PORT" envDefault:"8082"`
 	AgentIP                string `env:"AGENT_IP"`
 	AgentPort              string `env:"AGENT_PORT" envDefault:"8080"`
-	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"5"`
+	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"15"`
 }
 
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {

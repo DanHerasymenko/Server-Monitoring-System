@@ -5,10 +5,10 @@ import (
 	"Server-Monitoring-System/internal/constants"
 	"Server-Monitoring-System/internal/logger"
 	"context"
-	"fmt"
 	"github.com/kardianos/service"
 	"log"
 	"os"
+	"time"
 )
 
 type Service struct {
@@ -18,29 +18,35 @@ type Service struct {
 }
 
 func NewService(cfg *config.Config, ctx context.Context, cancel context.CancelFunc) *Service {
+	ctx, cancelFunc := context.WithCancel(ctx)
 	return &Service{
 		cfg:     cfg,
 		context: ctx,
-		cancel:  cancel,
+		cancel:  cancelFunc,
 	}
 }
 
-func (s *Service) Start(svc service.Service) error {
-	s.context, s.cancel = context.WithCancel(context.Background())
-
-	go s.run()
-	return nil
-}
-
 func (s *Service) Stop(svc service.Service) error {
-	logger.Info(s.context, "Agent stop...")
+	//serviceLogger.Info(s.context, "Agent stop...")
 
 	s.cancel()
 	return nil
 }
 
+func (s *Service) Start(svc service.Service) error {
+	logger.Info(s.context, "🚀 Agent starting...")
+
+	go func() {
+		time.Sleep(1 * time.Second) // ✅ Give Windows a small delay before running
+		s.run()
+	}()
+
+	return nil // ✅ Ensure `Start()` exits quickly
+}
+
 func (s *Service) run() {
-	logger.Info(s.context, "Agent started in background...")
+
+	logger.Info(s.context, "✅ Agent is running...")
 
 	for {
 		select {
@@ -48,8 +54,10 @@ func (s *Service) run() {
 			logger.Info(s.context, "Agent stopped")
 			return
 		default:
+			logger.Info(s.context, "Collecting metrics...")
 			s.CollectMetrics()
 		}
+		time.Sleep(time.Duration(s.cfg.CollectMetricsInterval) * time.Second)
 	}
 }
 
@@ -65,6 +73,9 @@ func (s *Service) RunAgentService() {
 		Name:        constants.ServiceName,
 		DisplayName: constants.ServiceDisplayName,
 		Description: constants.ServiceDescription,
+		//Dependencies: []string{
+		//	constants.DependencieNetwork,
+		//	constants.DependencieAfter},
 	}
 
 	svc, err := service.New(s, svcConfig)
@@ -72,43 +83,58 @@ func (s *Service) RunAgentService() {
 		log.Fatalf("Error creating a service: %v", err)
 	}
 
+	serviceLogger, err := svc.Logger(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// service commands handling
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
-		// installs as Windows service
+		case "status":
+			status, err := svc.Status()
+			if err == nil {
+				serviceLogger.Infof("Service status: %v", status)
+			}
 		case "install":
 			err = svc.Install()
 			if err == nil {
-				fmt.Println("Service successfully installed!")
+				serviceLogger.Info("Service successfully installed!")
 			}
 		case "uninstall":
+			err = svc.Stop()
+			if err == nil {
+				serviceLogger.Info("Service successfully stopped!")
+			}
 			err = svc.Uninstall()
 			if err == nil {
-				fmt.Println("Service successfully uninstalled!")
+				serviceLogger.Info("Service successfully uninstalled!")
 			}
 		case "start":
 			err = svc.Start()
 			if err == nil {
-				fmt.Println("Service started!")
+				serviceLogger.Info(" Service successfully started!")
 			}
+			// Start service execution
+			err = svc.Run()
+			if err != nil {
+				log.Fatalf("❌ Error running service: %v", err)
+			}
+
 		case "stop":
 			err = svc.Stop()
 			if err == nil {
-				fmt.Println("Service stopped!")
+				serviceLogger.Info("Service successfully stopped!")
 			}
 		default:
-			fmt.Println("Available commands: install, uninstall, start, stop")
+			serviceLogger.Info("Unknown command, available commands: install, uninstall, start, stop")
 		}
 
 		if err != nil {
-			fmt.Println("Error:", err)
+			serviceLogger.Infof("Error: %v", err)
 		}
+
 		return
 	}
 
-	// start service
-	err = svc.Run()
-	if err != nil {
-		log.Fatalf("Error starting the service: %v", err)
-	}
 }

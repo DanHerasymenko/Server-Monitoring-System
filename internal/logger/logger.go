@@ -21,7 +21,7 @@ func init() {
 	once.Do(func() {
 		// create log directory
 		logDir := "logs"
-		if err := os.MkdirAll(logDir, os.ModePerm); err != nil {
+		if err := os.MkdirAll(logDir, 0777); err != nil {
 			panic(fmt.Errorf("failed to create log directory: %w", err))
 			return
 		}
