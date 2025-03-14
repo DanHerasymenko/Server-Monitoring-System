@@ -27,21 +27,18 @@ func NewService(cfg *config.Config, ctx context.Context, cancel context.CancelFu
 }
 
 func (s *Service) Stop(svc service.Service) error {
-	//serviceLogger.Info(s.context, "Agent stop...")
 
 	s.cancel()
 	return nil
 }
 
 func (s *Service) Start(svc service.Service) error {
-	logger.Info(s.context, "🚀 Agent starting...")
 
 	go func() {
-		time.Sleep(1 * time.Second) // ✅ Give Windows a small delay before running
 		s.run()
 	}()
 
-	return nil // ✅ Ensure `Start()` exits quickly
+	return nil
 }
 
 func (s *Service) run() {
@@ -51,7 +48,7 @@ func (s *Service) run() {
 	for {
 		select {
 		case <-s.context.Done():
-			logger.Info(s.context, "Agent stopped")
+			logger.Info(s.context, "Agent is stopped")
 			return
 		default:
 			logger.Info(s.context, "Collecting metrics...")
@@ -88,53 +85,38 @@ func (s *Service) RunAgentService() {
 		log.Fatal(err)
 	}
 
-	// service commands handling
+	// якщо є команда (install, uninstall, start, stop), робимо її та робимо return.
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
-		case "status":
-			status, err := svc.Status()
-			if err == nil {
-				serviceLogger.Infof("Service status: %v", status)
-			}
 		case "install":
 			err = svc.Install()
-			if err == nil {
-				serviceLogger.Info("Service successfully installed!")
-			}
+			return
 		case "uninstall":
 			err = svc.Stop()
-			if err == nil {
-				serviceLogger.Info("Service successfully stopped!")
-			}
 			err = svc.Uninstall()
-			if err == nil {
-				serviceLogger.Info("Service successfully uninstalled!")
-			}
+			return
 		case "start":
-			err = svc.Start()
-			if err == nil {
-				serviceLogger.Info(" Service successfully started!")
-			}
-			// Start service execution
-			err = svc.Run()
-			if err != nil {
-				log.Fatalf("❌ Error running service: %v", err)
-			}
+			serviceLogger.Info("1111111111111111111")
+			logger.Info(s.context, "111111111111111111")
 
+			err = svc.Start()
 		case "stop":
 			err = svc.Stop()
-			if err == nil {
-				serviceLogger.Info("Service successfully stopped!")
-			}
+			return
 		default:
-			serviceLogger.Info("Unknown command, available commands: install, uninstall, start, stop")
+			serviceLogger.Info("Unknown command")
+			return
 		}
 
 		if err != nil {
-			serviceLogger.Infof("Error: %v", err)
+			serviceLogger.Errorf("Error: %v", err)
 		}
 
-		return
+	}
+
+	err = svc.Run()
+	if err != nil {
+		serviceLogger.Info("error")
 	}
 
 }

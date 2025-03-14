@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/natefinch/lumberjack"
-	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -19,11 +18,11 @@ var (
 func init() {
 
 	once.Do(func() {
-		// create log directory
-		logDir := "logs"
+
+		logDir := `C:\Logs\ServerMonitoringAgent`
+
 		if err := os.MkdirAll(logDir, 0777); err != nil {
 			panic(fmt.Errorf("failed to create log directory: %w", err))
-			return
 		}
 
 		//log rotation
@@ -37,9 +36,14 @@ func init() {
 
 		// init logger with JSON handler
 		// write to stdout and file
-		h := slog.NewJSONHandler(io.MultiWriter(os.Stdout, logFile), &slog.HandlerOptions{
+		//h := slog.NewJSONHandler(io.MultiWriter(os.Stdout, logFile), &slog.HandlerOptions{
+		//	Level: slog.LevelInfo,
+		//})
+
+		h := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})
+
 		l := slog.New(h)
 		slog.SetDefault(l)
 
