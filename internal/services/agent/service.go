@@ -8,7 +8,6 @@ import (
 	"github.com/kardianos/service"
 	"log"
 	"os"
-	"time"
 )
 
 type Service struct {
@@ -43,7 +42,7 @@ func (s *Service) Start(svc service.Service) error {
 
 func (s *Service) run() {
 
-	logger.Info(s.context, "✅ Agent is running...")
+	logger.Info(s.context, "Agent is running...")
 
 	for {
 		select {
@@ -54,7 +53,6 @@ func (s *Service) run() {
 			logger.Info(s.context, "Collecting metrics...")
 			s.CollectMetrics()
 		}
-		time.Sleep(time.Duration(s.cfg.CollectMetricsInterval) * time.Second)
 	}
 }
 
@@ -90,21 +88,41 @@ func (s *Service) RunAgentService() {
 		switch os.Args[1] {
 		case "install":
 			err = svc.Install()
+			if err != nil {
+				serviceLogger.Errorf("Error: %v", err)
+			} else {
+				serviceLogger.Info("Service installed successfully")
+			}
 			return
 		case "uninstall":
 			err = svc.Stop()
+			if err != nil {
+				serviceLogger.Errorf("Error: %v", err)
+			}
 			err = svc.Uninstall()
+			if err != nil {
+				serviceLogger.Errorf("Error: %v", err)
+			} else {
+				serviceLogger.Info("Service uninstalled successfully")
+			}
 			return
 		case "start":
-			serviceLogger.Info("1111111111111111111")
-			logger.Info(s.context, "111111111111111111")
-
 			err = svc.Start()
+			if err != nil {
+				serviceLogger.Errorf("Error: %v", err)
+			} else {
+				serviceLogger.Info("Service started successfully")
+			}
 		case "stop":
 			err = svc.Stop()
+			if err != nil {
+				serviceLogger.Errorf("Error: %v", err)
+			} else {
+				serviceLogger.Info("Service stopped successfully")
+			}
 			return
 		default:
-			serviceLogger.Info("Unknown command")
+			serviceLogger.Info("Unknown command, use install, uninstall, start or stop")
 			return
 		}
 

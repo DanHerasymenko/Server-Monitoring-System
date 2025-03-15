@@ -18,6 +18,7 @@ type Metrics struct {
 }
 
 func (s *Service) CollectMetrics() {
+
 	m, err := getMetrics()
 	if err != nil {
 		logger.Error(s.context, fmt.Errorf("error getting metrics %v", err))
@@ -30,6 +31,7 @@ func (s *Service) CollectMetrics() {
 		slog.Float64("Disk", m.DiskUsage),
 	)
 
+	time.Sleep(time.Duration(s.cfg.CollectMetricsInterval) * time.Second)
 }
 
 func getMetrics() (*Metrics, error) {

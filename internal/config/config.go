@@ -6,7 +6,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/caarlos0/env/v11"
+	"github.com/joho/godotenv"
 	"log/slog"
+	"os"
+	"path/filepath"
 )
 
 type Config struct {
@@ -19,6 +22,15 @@ type Config struct {
 }
 
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {
+
+	// read explicitly from .env file
+
+	envPath := filepath.Join(filepath.Dir(os.Args[0]), ".env")
+	if err := godotenv.Load(envPath); err != nil {
+		logger.Warn(ctx, "Failed to load .env file, using OS env",
+			slog.String("path", envPath))
+	}
+
 	cfg := &Config{}
 
 	err := env.Parse(cfg)

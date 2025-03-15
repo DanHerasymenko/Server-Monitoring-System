@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/caarlos0/env/v11 v11.3.1
+	github.com/joho/godotenv v1.5.1
 	github.com/kardianos/service v1.2.2
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/shirou/gopsutil/v3 v3.24.5

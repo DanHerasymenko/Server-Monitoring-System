@@ -19,11 +19,14 @@ func init() {
 
 	once.Do(func() {
 
-		logDir := `C:\Logs\ServerMonitoringAgent`
-
-		if err := os.MkdirAll(logDir, 0777); err != nil {
-			panic(fmt.Errorf("failed to create log directory: %w", err))
+		// create log directory
+		path, err := os.Executable()
+		if err != nil {
+			panic(fmt.Errorf("failed to get executable path: %w", err))
 		}
+
+		exeDir := filepath.Dir(path)
+		logDir := filepath.Join(exeDir, "logs")
 
 		//log rotation
 		logFile = &lumberjack.Logger{
@@ -34,12 +37,8 @@ func init() {
 			Compress:   true,
 		}
 
-		// init logger with JSON handler
-		// write to stdout and file
-		//h := slog.NewJSONHandler(io.MultiWriter(os.Stdout, logFile), &slog.HandlerOptions{
-		//	Level: slog.LevelInfo,
-		//})
-
+		// create logger
+		// write only in file. if writing to stdout: win service will not write logs at all
 		h := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})
