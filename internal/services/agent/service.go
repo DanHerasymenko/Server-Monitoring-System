@@ -5,6 +5,7 @@ import (
 	"Server-Monitoring-System/internal/constants"
 	"Server-Monitoring-System/internal/logger"
 	"context"
+	"fmt"
 	"github.com/kardianos/service"
 	"log"
 	"os"
@@ -131,7 +132,9 @@ func (s *Service) RunAgentService() {
 		}
 
 	}
+	path, err := os.Getwd()
 
+	fmt.Println(path)
 	err = svc.Run()
 	if err != nil {
 		serviceLogger.Info("error")

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -16,32 +17,46 @@ var (
 )
 
 func init() {
-
 	once.Do(func() {
+		var logDir string
 
-		path, err := os.Getwd()
+		// Get the current working directory
+		wd, err := os.Getwd()
+		if err != nil {
+			panic(fmt.Errorf("failed to get working directory: %w", err))
+		}
 
-		if path == "C:\\Windows\\System32\\" {
-			path, err = os.Executable()
+		// Normalize paths for comparison
+		wd = filepath.Clean(wd)
+		system32Path := filepath.Clean(`C:\Windows\System32`)
+
+		// If running as a Windows Service (default System32 path), get executable path
+		if strings.EqualFold(wd, system32Path) {
+			exePath, err := os.Executable()
 			if err != nil {
 				panic(fmt.Errorf("failed to get executable path: %w", err))
 			}
+			exeDir := filepath.Dir(exePath)
+			logDir = filepath.Join(exeDir, "logs")
+		} else {
+			logDir = filepath.Join(wd, "logs")
 		}
 
-		//exeDir := filepath.Dir(wd)
-		logDir := filepath.Join(path, "logs")
+		// Ensure log directory exists
+		if err := os.MkdirAll(logDir, 0777); err != nil {
+			panic(fmt.Errorf("failed to create log directory: %w", err))
+		}
 
-		//log rotation
+		// Set up log rotation
 		logFile = &lumberjack.Logger{
 			Filename:   filepath.Join(logDir, "monitoring_agent.log"),
-			MaxSize:    10,
-			MaxBackups: 3,
-			MaxAge:     7,
+			MaxSize:    10, // Max size in MB
+			MaxBackups: 3,  // Max backup files
+			MaxAge:     7,  // Max days before rotation
 			Compress:   true,
 		}
 
-		// create logger
-		// write only in file. if writing to stdout: win service will not write logs at all
+		// Create logger, only writing to file (no stdout for Windows Service)
 		h := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
 			Level: slog.LevelInfo,
 		})
@@ -49,6 +64,8 @@ func init() {
 		l := slog.New(h)
 		slog.SetDefault(l)
 
+		// Debug: Log the selected log directory
+		slog.Default().Info("Logger initialized", "logDir", logDir)
 	})
 }
 

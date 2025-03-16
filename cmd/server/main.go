@@ -11,17 +11,18 @@ import (
 )
 
 type server struct {
-	pb.MonitoringServiceServer
+	pb.UnimplementedMonitoringServiceServer
 }
 
-//func (s *server) SayHello(ctx context.Context, in *pb.HelloWorldRequest) (*pb.HelloWorldResponse, error) {
-//	return &pb.HelloWorldResponse{Message: "Hello, World! "}, nil
-//}
+func (s *server) StreamMetrics(ctx context.Context, req *pb.MetricsRequest) (*pb.MetricsResponse, error) {
+	fmt.Println("StreamMetrics")
+	return &pb.MetricsResponse{Status: "OK!"}, nil
+}
 
 func main() {
 
-	ctx, _ := context.WithCancel(context.Background())
-
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	defer logger.Close()
 
 	// listen on port 50051
