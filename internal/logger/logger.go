@@ -19,14 +19,17 @@ func init() {
 
 	once.Do(func() {
 
-		// create log directory
-		path, err := os.Executable()
-		if err != nil {
-			panic(fmt.Errorf("failed to get executable path: %w", err))
+		path, err := os.Getwd()
+
+		if path == "C:\\Windows\\System32\\" {
+			path, err = os.Executable()
+			if err != nil {
+				panic(fmt.Errorf("failed to get executable path: %w", err))
+			}
 		}
 
-		exeDir := filepath.Dir(path)
-		logDir := filepath.Join(exeDir, "logs")
+		//exeDir := filepath.Dir(wd)
+		logDir := filepath.Join(path, "logs")
 
 		//log rotation
 		logFile = &lumberjack.Logger{

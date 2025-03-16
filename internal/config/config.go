@@ -24,7 +24,6 @@ type Config struct {
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {
 
 	// read explicitly from .env file
-
 	envPath := filepath.Join(filepath.Dir(os.Args[0]), ".env")
 	if err := godotenv.Load(envPath); err != nil {
 		logger.Warn(ctx, "Failed to load .env file, using OS env",

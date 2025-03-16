@@ -1,47 +1,45 @@
 package main
 
 import (
-	"Server-Monitoring-System/internal/config"
+	"Server-Monitoring-System/internal/logger"
+	pb "Server-Monitoring-System/proto"
 	"context"
 	"fmt"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
+	"google.golang.org/grpc"
+	"log/slog"
+	"net"
 )
+
+type server struct {
+	pb.MonitoringServiceServer
+}
+
+//func (s *server) SayHello(ctx context.Context, in *pb.HelloWorldRequest) (*pb.HelloWorldResponse, error) {
+//	return &pb.HelloWorldResponse{Message: "Hello, World! "}, nil
+//}
 
 func main() {
 
-	ctx := context.Background()
+	ctx, _ := context.WithCancel(context.Background())
 
-	cfg, err := config.NewConfigFromEnv(ctx)
+	defer logger.Close()
+
+	// listen on port 50051
+	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
-		fmt.Println("failed to load config: %w", err)
+		logger.Fatal(ctx, fmt.Errorf("failed to listen: %w", err))
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Hello, World!")
-	})
+	// create a gRPC server object
+	grpcServer := grpc.NewServer()
 
-	server := &http.Server{
-		Addr:    cfg.ServerPort,
-		Handler: mux,
+	// register the server with the gRPC server
+	pb.RegisterMonitoringServiceServer(grpcServer, &server{})
+
+	// start the server
+	lisAddrStr := lis.Addr().String()
+	logger.Info(ctx, "Starting server...", slog.String("address", lisAddrStr))
+	if err := grpcServer.Serve(lis); err != nil {
+		logger.Fatal(ctx, fmt.Errorf("failed to serve: %w", err))
 	}
-
-	go func() {
-		err = server.ListenAndServe()
-		if err != nil {
-			fmt.Println("failed to start server: %w", err)
-		}
-	}()
-
-	fmt.Println("server started")
-
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-	<-sigChan
-
-	err = server.Shutdown(nil)
-
 }
