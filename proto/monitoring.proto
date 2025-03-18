@@ -12,7 +12,7 @@ service MonitoringService {
 }
 
 message MetricsRequest {
-  string server_id = 1;
+  string server_ip = 1;
   float cpu_usage = 2;
   float ram_usage = 3;
   float disk_usage = 4;

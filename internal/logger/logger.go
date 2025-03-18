@@ -63,9 +63,6 @@ func init() {
 
 		l := slog.New(h)
 		slog.SetDefault(l)
-
-		// Debug: Log the selected log directory
-		slog.Default().Info("Logger initialized", "logDir", logDir)
 	})
 }
 
