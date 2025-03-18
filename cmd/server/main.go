@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log/slog"
 	"net"
 	"os"
@@ -28,6 +29,7 @@ func main() {
 
 	// create a gRPC server object
 	grpcServer := grpc.NewServer()
+	reflection.Register(grpcServer)
 
 	// register the server with the gRPC server
 	pb.RegisterMonitoringServiceServer(grpcServer, &stream.Server{})

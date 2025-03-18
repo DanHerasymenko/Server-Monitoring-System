@@ -36,7 +36,7 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 				slog.Any("cpu", req.CpuUsage), // Any підтримує float64
 				slog.Any("ram", req.RamUsage),
 				slog.Any("disk", req.DiskUsage),
-				slog.Int64("time", req.Timestamp),
+				slog.Int64("timestamp", req.Timestamp),
 			)
 
 			// Відповідь назад клієнту
