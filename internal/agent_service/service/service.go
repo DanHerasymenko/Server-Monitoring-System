@@ -4,6 +4,7 @@ import (
 	"Server-Monitoring-System/internal/config"
 	"Server-Monitoring-System/internal/constants"
 	"Server-Monitoring-System/internal/logger"
+	pb "Server-Monitoring-System/proto"
 	"context"
 	"fmt"
 	"github.com/kardianos/service"
@@ -15,14 +16,15 @@ type Service struct {
 	cfg     *config.Config
 	context context.Context
 	cancel  context.CancelFunc
+	client  pb.MonitoringService_StreamMetricsClient
 }
 
-func NewService(cfg *config.Config, ctx context.Context, cancel context.CancelFunc) *Service {
-	ctx, cancelFunc := context.WithCancel(ctx)
+func NewService(cfg *config.Config, ctx context.Context, cancel context.CancelFunc, client pb.MonitoringService_StreamMetricsClient) *Service {
 	return &Service{
 		cfg:     cfg,
 		context: ctx,
-		cancel:  cancelFunc,
+		cancel:  cancel,
+		client:  client,
 	}
 }
 
@@ -52,7 +54,18 @@ func (s *Service) run() {
 			return
 		default:
 			logger.Info(s.context, "Collecting metrics...")
-			s.CollectMetrics()
+			collectedMetrics, err := s.CollectMetrics()
+			if err != nil {
+				logger.Error(s.context, fmt.Errorf("error collecting metrics: %v", err))
+				continue
+			}
+
+			err = s.SendMetrics(collectedMetrics, s.client)
+			if err != nil {
+				logger.Error(s.context, fmt.Errorf("error sending metrics: %v", err))
+				continue
+			}
+
 		}
 	}
 }

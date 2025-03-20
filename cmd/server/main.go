@@ -45,7 +45,7 @@ func main() {
 	}()
 	logger.Info(ctx, "Server started")
 
-	// Graceful shutdown
+	// graceful shutdown
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan

@@ -14,9 +14,9 @@ import (
 
 type Config struct {
 	Env                    string `env:"APP_ENV" envDefault:"local"`
-	ServerIP               string `env:"SERVER_IP"`
+	ServerIP               string `env:"SERVER_IP" envDefault:"localhost"`
 	ServerPort             string `env:"SERVER_PORT" envDefault:"8082"`
-	AgentIP                string `env:"AGENT_IP"`
+	AgentIP                string `env:"AGENT_IP" envDefault:"50051"`
 	AgentPort              string `env:"AGENT_PORT" envDefault:"8080"`
 	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"15"`
 }

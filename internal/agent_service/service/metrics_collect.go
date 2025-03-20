@@ -17,21 +17,23 @@ type Metrics struct {
 	Timestamp int64
 }
 
-func (s *Service) CollectMetrics() {
+func (s *Service) CollectMetrics() (*Metrics, error) {
 
 	m, err := getMetrics()
 	if err != nil {
 		logger.Error(s.context, fmt.Errorf("error getting metrics %v", err))
-		return
+		return nil, err
 	}
 
 	logger.Info(s.context, "Metrics collected",
-		slog.Float64("CPU", m.CpuUsage),
-		slog.Float64("RAM", m.RamUsage),
-		slog.Float64("Disk", m.DiskUsage),
+		slog.Any("CPU", m.CpuUsage),
+		slog.Any("RAM", m.RamUsage),
+		slog.Any("Disk", m.DiskUsage),
+		slog.Any("Timestamp", m.Timestamp),
 	)
 
 	time.Sleep(time.Duration(s.cfg.CollectMetricsInterval) * time.Second)
+	return m, nil
 }
 
 func getMetrics() (*Metrics, error) {
