@@ -44,7 +44,7 @@ func NewConfigFromEnv(ctx context.Context) (*Config, error) {
 	}
 
 	if cfg.ServerIP == "" {
-		logger.Warn(ctx, "ServerIP is not set, can be issues with the server connection")
+		logger.Warn(ctx, "ServerIP is not set, can be issues with the server_service connection")
 	}
 
 	logger.Info(ctx, "config loaded",

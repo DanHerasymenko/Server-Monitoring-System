@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Server-Monitoring-System/cmd/server/stream"
 	"Server-Monitoring-System/internal/logger"
+	"Server-Monitoring-System/internal/server_service/stream"
 	pb "Server-Monitoring-System/proto"
 	"context"
 	"fmt"
@@ -27,20 +27,20 @@ func main() {
 		logger.Fatal(ctx, fmt.Errorf("failed to listen: %w", err))
 	}
 
-	// create a gRPC server object
+	// create a gRPC server_service object
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
 
-	// register the server with the gRPC server
+	// register the server_service with the gRPC server_service
 	pb.RegisterMonitoringServiceServer(grpcServer, &stream.Server{})
 
 	lisAddrStr := lis.Addr().String()
 
-	// start the server
-	logger.Info(ctx, "Starting server...", slog.String("address", lisAddrStr))
+	// start the server_service
+	logger.Info(ctx, "Starting server_service...", slog.String("address", lisAddrStr))
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
-			logger.Panic(ctx, fmt.Errorf("failed to start server: %w", err))
+			logger.Panic(ctx, fmt.Errorf("failed to start server_service: %w", err))
 		}
 	}()
 	logger.Info(ctx, "Server started")
@@ -50,7 +50,7 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 
-	logger.Info(ctx, "Shutting down server...")
+	logger.Info(ctx, "Shutting down server_service...")
 	grpcServer.GracefulStop()
 	lis.Close()
 	logger.Info(ctx, "Server stopped")

@@ -24,7 +24,7 @@ const (
 	MonitoringService_StreamMetrics_FullMethodName = "/monitoring.MonitoringService/StreamMetrics"
 )
 
-// MonitoringServiceClient is the client API for MonitoringService service.
+// MonitoringServiceClient is the client API for MonitoringService stream.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
@@ -54,7 +54,7 @@ func (c *monitoringServiceClient) StreamMetrics(ctx context.Context, opts ...grp
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MonitoringService_StreamMetricsClient = grpc.BidiStreamingClient[MetricsRequest, MetricsResponse]
 
-// MonitoringServiceServer is the server API for MonitoringService service.
+// MonitoringServiceServer is the server_service API for MonitoringService stream.
 // All implementations must embed UnimplementedMonitoringServiceServer
 // for forward compatibility.
 //
@@ -77,7 +77,7 @@ func (UnimplementedMonitoringServiceServer) StreamMetrics(grpc.BidiStreamingServ
 func (UnimplementedMonitoringServiceServer) mustEmbedUnimplementedMonitoringServiceServer() {}
 func (UnimplementedMonitoringServiceServer) testEmbeddedByValue()                           {}
 
-// UnsafeMonitoringServiceServer may be embedded to opt out of forward compatibility for this service.
+// UnsafeMonitoringServiceServer may be embedded to opt out of forward compatibility for this stream.
 // Use of this interface is not recommended, as added methods to MonitoringServiceServer will
 // result in compilation errors.
 type UnsafeMonitoringServiceServer interface {
@@ -102,7 +102,7 @@ func _MonitoringService_StreamMetrics_Handler(srv interface{}, stream grpc.Serve
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MonitoringService_StreamMetricsServer = grpc.BidiStreamingServer[MetricsRequest, MetricsResponse]
 
-// MonitoringService_ServiceDesc is the grpc.ServiceDesc for MonitoringService service.
+// MonitoringService_ServiceDesc is the grpc.ServiceDesc for MonitoringService stream.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var MonitoringService_ServiceDesc = grpc.ServiceDesc{

@@ -3,7 +3,7 @@ package constants
 const (
 	ServiceName        = "MonitoringAgent"
 	ServiceDisplayName = "Monitoring Agent"
-	ServiceDescription = "Collects metrics and sends them to the server via gRPC streaming"
+	ServiceDescription = "Collects metrics and sends them to the server_service via gRPC streaming"
 	DependencieNetwork = "Requires=network.target"
 	DependencieAfter   = "After=network-online.target syslog.target"
 )

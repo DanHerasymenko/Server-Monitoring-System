@@ -1,17 +1,17 @@
-package services
+package agent_service
 
 import (
+	"Server-Monitoring-System/internal/agent_service/service"
 	"Server-Monitoring-System/internal/config"
-	"Server-Monitoring-System/internal/services/agent"
 	"context"
 )
 
 type Services struct {
-	Agent *agent.Service
+	Agent *service.Service
 }
 
 func NewServices(cfg *config.Config, ctx context.Context, cancel context.CancelFunc) *Services {
 	return &Services{
-		Agent: agent.NewService(cfg, ctx, cancel),
+		Agent: service.NewService(cfg, ctx, cancel),
 	}
 }

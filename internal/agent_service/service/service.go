@@ -1,4 +1,4 @@
-package agent
+package service
 
 import (
 	"Server-Monitoring-System/internal/config"
@@ -57,14 +57,14 @@ func (s *Service) run() {
 	}
 }
 
-// RunAgentService – service initialization
+// RunAgentService – stream initialization
 func (s *Service) RunAgentService() {
 
-	// add server and agent IP to context
+	// add server_service and agent_service IP to context
 	s.context = logger.SetServerIP(s.context, s.cfg.ServerIP)
 	s.context = logger.SetAgentIP(s.context, s.cfg.AgentIP)
 
-	// configure service
+	// configure stream
 	svcConfig := &service.Config{
 		Name:        constants.ServiceName,
 		DisplayName: constants.ServiceDisplayName,
@@ -76,7 +76,7 @@ func (s *Service) RunAgentService() {
 
 	svc, err := service.New(s, svcConfig)
 	if err != nil {
-		log.Fatalf("Error creating a service: %v", err)
+		log.Fatalf("Error creating a stream: %v", err)
 	}
 
 	serviceLogger, err := svc.Logger(nil)
