@@ -10,12 +10,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"log"
-	"time"
 )
 
 func main() {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	cfg, err := config.NewConfigFromEnv(ctx)
@@ -33,7 +32,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	// create a gRPC client
+	//create a gRPC client
 	client := pb.NewMonitoringServiceClient(conn)
 
 	stream, err := client.StreamMetrics(ctx)

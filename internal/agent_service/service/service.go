@@ -10,6 +10,7 @@ import (
 	"github.com/kardianos/service"
 	"log"
 	"os"
+	"time"
 )
 
 type Service struct {
@@ -62,10 +63,11 @@ func (s *Service) run() {
 
 			err = s.SendMetrics(collectedMetrics, s.client)
 			if err != nil {
-				logger.Error(s.context, fmt.Errorf("error sending metrics: %v", err))
+				logger.Error(s.context, err)
 				continue
 			}
 
+			time.Sleep(time.Duration(s.cfg.CollectMetricsInterval) * time.Second)
 		}
 	}
 }

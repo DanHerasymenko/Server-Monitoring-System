@@ -32,7 +32,6 @@ func (s *Service) CollectMetrics() (*Metrics, error) {
 		slog.Any("Timestamp", m.Timestamp),
 	)
 
-	time.Sleep(time.Duration(s.cfg.CollectMetricsInterval) * time.Second)
 	return m, nil
 }
 

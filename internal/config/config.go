@@ -15,10 +15,10 @@ import (
 type Config struct {
 	Env                    string `env:"APP_ENV" envDefault:"local"`
 	ServerIP               string `env:"SERVER_IP" envDefault:"localhost"`
-	ServerPort             string `env:"SERVER_PORT" envDefault:"8082"`
-	AgentIP                string `env:"AGENT_IP" envDefault:"50051"`
-	AgentPort              string `env:"AGENT_PORT" envDefault:"8080"`
-	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"15"`
+	ServerPort             string `env:"SERVER_PORT" envDefault:"50051"`
+	AgentIP                string `env:"AGENT_IP" envDefault:"localhost"`
+	AgentPort              string `env:"AGENT_PORT" envDefault:"50052"`
+	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"10"`
 }
 
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {

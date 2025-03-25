@@ -10,6 +10,7 @@ import (
 func (s *Service) SendMetrics(collectedMetrics *Metrics, client pb.MonitoringService_StreamMetricsClient) error {
 
 	metricsReq := &pb.MetricsRequest{
+		ServerIp:  s.cfg.AgentIP,
 		CpuUsage:  float32(collectedMetrics.CpuUsage),
 		RamUsage:  float32(collectedMetrics.RamUsage),
 		DiskUsage: float32(collectedMetrics.DiskUsage),
@@ -17,11 +18,10 @@ func (s *Service) SendMetrics(collectedMetrics *Metrics, client pb.MonitoringSer
 	}
 
 	if err := client.Send(metricsReq); err != nil {
-		logger.Error(s.context, fmt.Errorf("error sending metrics: %v", err))
-		return err
+		return fmt.Errorf("error sending metrics: %w", err)
 	}
 
-	logger.Info(s.context, "Metrics collected",
+	logger.Info(s.context, "Metrics sent",
 		slog.Any("CPU", metricsReq.CpuUsage),
 		slog.Any("RAM", metricsReq.RamUsage),
 		slog.Any("Disk", metricsReq.DiskUsage),
