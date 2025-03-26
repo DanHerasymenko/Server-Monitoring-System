@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"Server-Monitoring-System/internal/clients/redis_client"
 	"Server-Monitoring-System/internal/logger"
 	pb "Server-Monitoring-System/proto"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 
 type Server struct {
 	pb.UnimplementedMonitoringServiceServer
+	Redis *redis_client.Client
 }
 
 func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) error {

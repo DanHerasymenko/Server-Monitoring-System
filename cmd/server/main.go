@@ -1,8 +1,10 @@
 package main
 
 import (
+	"Server-Monitoring-System/cmd/server/stream"
+	"Server-Monitoring-System/internal/clients"
+	"Server-Monitoring-System/internal/config"
 	"Server-Monitoring-System/internal/logger"
-	"Server-Monitoring-System/internal/server_service/stream"
 	pb "Server-Monitoring-System/proto"
 	"context"
 	"fmt"
@@ -20,6 +22,15 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	defer logger.Close()
+
+	// load config
+	cfg, err := config.NewConfigFromEnv(ctx)
+	if err != nil {
+		logger.Fatal(ctx, fmt.Errorf("failed to load config: %w", err))
+	}
+
+	// initialize clients
+	_, err = clients.NewClients(ctx, cfg)
 
 	// listen on port 50051
 	lis, err := net.Listen("tcp", ":50051")
