@@ -54,7 +54,7 @@ func (c *monitoringServiceClient) StreamMetrics(ctx context.Context, opts ...grp
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type MonitoringService_StreamMetricsClient = grpc.BidiStreamingClient[MetricsRequest, MetricsResponse]
 
-// MonitoringServiceServer is the server_service API for MonitoringService stream.
+// MonitoringServiceServer is the server_services API for MonitoringService stream.
 // All implementations must embed UnimplementedMonitoringServiceServer
 // for forward compatibility.
 //

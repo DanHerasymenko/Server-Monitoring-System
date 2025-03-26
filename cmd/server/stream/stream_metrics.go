@@ -1,8 +1,9 @@
 package stream
 
 import (
-	"Server-Monitoring-System/internal/clients/redis_client"
+	"Server-Monitoring-System/internal/clients"
 	"Server-Monitoring-System/internal/logger"
+	"Server-Monitoring-System/internal/server_services"
 	pb "Server-Monitoring-System/proto"
 	"fmt"
 	"io"
@@ -11,12 +12,18 @@ import (
 
 type Server struct {
 	pb.UnimplementedMonitoringServiceServer
-	Redis *redis_client.Client
+	Clients  *clients.Clients
+	Services *server_services.Services
 }
 
 func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) error {
 
 	ctx := stream.Context()
+
+	if err := s.Services.RedisS.Ping(ctx); err != nil {
+		logger.Error(ctx, err)
+	}
+	logger.Info(ctx, "Redis ping successful")
 
 	for {
 		req, err := stream.Recv()

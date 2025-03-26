@@ -75,7 +75,7 @@ func (s *Service) run() {
 // RunAgentService – stream initialization
 func (s *Service) RunAgentService() {
 
-	// add server_service and agent_service IP to context
+	// add server_services and agent_services IP to context
 	s.context = logger.SetServerIP(s.context, s.cfg.ServerIP)
 	s.context = logger.SetAgentIP(s.context, s.cfg.AgentIP)
 

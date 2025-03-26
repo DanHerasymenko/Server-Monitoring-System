@@ -1,25 +1,25 @@
 package clients
 
 import (
-	"Server-Monitoring-System/internal/clients/redis_client"
+	"Server-Monitoring-System/internal/clients/redis_clnt"
 	"Server-Monitoring-System/internal/config"
 	"context"
 	"fmt"
 )
 
 type Clients struct {
-	Redis *redis_client.Client
+	RedisClnt *redis_clnt.Client
 }
 
 func NewClients(ctx context.Context, cfg *config.Config) (*Clients, error) {
 
-	redisClient, err := redis_client.NewRedisClient("", "", 1)
+	redisClient, err := redis_clnt.NewRedisClient("", "", 0)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create redis_client client: %w", err)
+		return nil, fmt.Errorf("failed to create redis_clnt client: %w", err)
 	}
 
 	clients := &Clients{
-		Redis: redisClient,
+		RedisClnt: redisClient,
 	}
 
 	return clients, nil

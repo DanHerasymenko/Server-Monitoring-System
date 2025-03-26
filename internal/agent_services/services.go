@@ -1,7 +1,7 @@
-package agent_service
+package agent_services
 
 import (
-	"Server-Monitoring-System/internal/agent_service/service"
+	"Server-Monitoring-System/internal/agent_services/service"
 	"Server-Monitoring-System/internal/config"
 	pb "Server-Monitoring-System/proto"
 	"context"

@@ -5,6 +5,7 @@ import (
 	"Server-Monitoring-System/internal/clients"
 	"Server-Monitoring-System/internal/config"
 	"Server-Monitoring-System/internal/logger"
+	"Server-Monitoring-System/internal/server_services"
 	pb "Server-Monitoring-System/proto"
 	"context"
 	"fmt"
@@ -30,7 +31,13 @@ func main() {
 	}
 
 	// initialize clients
-	_, err = clients.NewClients(ctx, cfg)
+	clnts, err := clients.NewClients(ctx, cfg)
+	if err != nil {
+		logger.Fatal(ctx, fmt.Errorf("failed to initialize clients: %w", err))
+	}
+
+	// initialize services
+	srvc := server_services.NewServices(cfg, clnts)
 
 	// listen on port 50051
 	lis, err := net.Listen("tcp", ":50051")
@@ -38,20 +45,23 @@ func main() {
 		logger.Fatal(ctx, fmt.Errorf("failed to listen: %w", err))
 	}
 
-	// create a gRPC server_service object
+	// create a gRPC server_services object
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
 
-	// register the server_service with the gRPC server_service
-	pb.RegisterMonitoringServiceServer(grpcServer, &stream.Server{})
+	// register the server_services with the gRPC server_services
+	pb.RegisterMonitoringServiceServer(grpcServer, &stream.Server{
+		Clients:  clnts,
+		Services: srvc,
+	})
 
 	lisAddrStr := lis.Addr().String()
 
-	// start the server_service
-	logger.Info(ctx, "Starting server_service...", slog.String("address", lisAddrStr))
+	// start the server_services
+	logger.Info(ctx, "Starting server_services...", slog.String("address", lisAddrStr))
 	go func() {
 		if err := grpcServer.Serve(lis); err != nil {
-			logger.Panic(ctx, fmt.Errorf("failed to start server_service: %w", err))
+			logger.Panic(ctx, fmt.Errorf("failed to start server_services: %w", err))
 		}
 	}()
 	logger.Info(ctx, "Server started")
@@ -61,7 +71,7 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 
-	logger.Info(ctx, "Shutting down server_service...")
+	logger.Info(ctx, "Shutting down server_services...")
 	grpcServer.GracefulStop()
 	lis.Close()
 	logger.Info(ctx, "Server stopped")

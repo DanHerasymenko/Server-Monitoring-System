@@ -1,7 +1,7 @@
 package main
 
 import (
-	"Server-Monitoring-System/internal/agent_service"
+	"Server-Monitoring-System/internal/agent_services"
 	"Server-Monitoring-System/internal/config"
 	"Server-Monitoring-System/internal/logger"
 	pb "Server-Monitoring-System/proto"
@@ -40,7 +40,7 @@ func main() {
 		log.Fatalf("Error opening grpc stream: %v", err)
 	}
 
-	svs := agent_service.NewServices(cfg, ctx, cancel, stream)
+	svs := agent_services.NewServices(cfg, ctx, cancel, stream)
 	defer logger.Close()
 	svs.Agent.RunAgentService()
 }
