@@ -38,9 +38,9 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 
 		logger.Info(ctx, "Server received metrics",
 			slog.String("server_ip", req.ServerIp),
-			slog.Any("cpu", req.CpuUsage),
-			slog.Any("ram", req.RamUsage),
-			slog.Any("disk", req.DiskUsage),
+			slog.Float64("cpu", req.CpuUsage),
+			slog.Float64("ram", req.RamUsage),
+			slog.Float64("disk", req.DiskUsage),
 			slog.Int64("timestamp", req.Timestamp),
 		)
 

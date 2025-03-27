@@ -11,9 +11,9 @@ func (s *Service) SendMetrics(collectedMetrics *Metrics, client pb.MonitoringSer
 
 	metricsReq := &pb.MetricsRequest{
 		ServerIp:  s.cfg.AgentIP,
-		CpuUsage:  float32(collectedMetrics.CpuUsage),
-		RamUsage:  float32(collectedMetrics.RamUsage),
-		DiskUsage: float32(collectedMetrics.DiskUsage),
+		CpuUsage:  collectedMetrics.CpuUsage,
+		RamUsage:  collectedMetrics.RamUsage,
+		DiskUsage: collectedMetrics.DiskUsage,
 		Timestamp: collectedMetrics.Timestamp,
 	}
 
@@ -22,10 +22,10 @@ func (s *Service) SendMetrics(collectedMetrics *Metrics, client pb.MonitoringSer
 	}
 
 	logger.Info(s.context, "Metrics sent",
-		slog.Any("CPU", metricsReq.CpuUsage),
-		slog.Any("RAM", metricsReq.RamUsage),
-		slog.Any("Disk", metricsReq.DiskUsage),
-		slog.Any("Timestamp", metricsReq.Timestamp),
+		slog.Float64("CPU", metricsReq.CpuUsage),
+		slog.Float64("RAM", metricsReq.RamUsage),
+		slog.Float64("Disk", metricsReq.DiskUsage),
+		slog.Int64("Timestamp", metricsReq.Timestamp),
 	)
 
 	resp, err := client.Recv()

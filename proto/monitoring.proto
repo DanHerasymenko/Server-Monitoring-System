@@ -13,9 +13,9 @@ service MonitoringService {
 
 message MetricsRequest {
   string server_ip = 1;
-  float cpu_usage = 2;
-  float ram_usage = 3;
-  float disk_usage = 4;
+  double cpu_usage = 2;
+  double ram_usage = 3;
+  double disk_usage = 4;
   int64 timestamp = 5;
 }
 

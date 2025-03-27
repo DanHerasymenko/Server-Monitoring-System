@@ -26,10 +26,10 @@ func (s *Service) CollectMetrics() (*Metrics, error) {
 	}
 
 	logger.Info(s.context, "Metrics collected",
-		slog.Any("CPU", m.CpuUsage),
-		slog.Any("RAM", m.RamUsage),
-		slog.Any("Disk", m.DiskUsage),
-		slog.Any("Timestamp", m.Timestamp),
+		slog.Float64("CPU", m.CpuUsage),
+		slog.Float64("RAM", m.RamUsage),
+		slog.Float64("Disk", m.DiskUsage),
+		slog.Int64("Timestamp", m.Timestamp),
 	)
 
 	return m, nil
