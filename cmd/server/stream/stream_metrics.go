@@ -46,7 +46,7 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 
 		err = s.Services.RedisS.SaveMetrics(ctx, req.ServerIp, req)
 		if err != nil {
-			logger.Error(ctx, fmt.Errorf("failed to save metrics after recieving: %w", err))
+			logger.Error(ctx, fmt.Errorf("failed to save metrics after receiving: %w", err))
 		}
 		logger.Info(ctx, "Metrics saved successfully")
 
