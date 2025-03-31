@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// initialize clients
-	clnts, err := clients.NewClients(ctx, cfg)
+	clnts, err := clients.NewClients(cfg)
 	if err != nil {
 		logger.Fatal(ctx, fmt.Errorf("failed to initialize clients: %w", err))
 	}

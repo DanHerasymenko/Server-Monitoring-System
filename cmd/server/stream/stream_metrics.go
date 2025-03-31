@@ -22,8 +22,9 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 
 	if err := s.Services.RedisS.Ping(ctx); err != nil {
 		logger.Error(ctx, err)
+	} else if err == nil {
+		logger.Info(ctx, "Redis ping successful")
 	}
-	logger.Info(ctx, "Redis ping successful")
 
 	for {
 		req, err := stream.Recv()

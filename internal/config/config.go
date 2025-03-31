@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/caarlos0/env/v11"
 	"github.com/joho/godotenv"
+	"log"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -18,21 +19,31 @@ type Config struct {
 	ServerPort             string `env:"SERVER_PORT" envDefault:"50051"`
 	AgentIP                string `env:"AGENT_IP" envDefault:"localhost"`
 	AgentPort              string `env:"AGENT_PORT" envDefault:"50052"`
-	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"10"`
+	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"20"`
+	RedisURL               string `env:"REDIS_URL" envDefault:"localhost:6380"`
+	RedisPassword          string `env:"REDIS_PASSWORD" envDefault:""`
+	RedisDB                int    `env:"REDIS_DB" envDefault:"0"`
 }
 
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {
 
-	// read explicitly from .env file
-	envPath := filepath.Join(filepath.Dir(os.Args[0]), ".env")
+	//// read explicitly from .env file
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	envPath := filepath.Join(dir, ".env")
+
 	if err := godotenv.Load(envPath); err != nil {
 		logger.Warn(ctx, "Failed to load .env file, using OS env",
-			slog.String("path", envPath))
+			slog.String("path", envPath),
+			slog.Any("err", err))
 	}
 
 	cfg := &Config{}
 
-	err := env.Parse(cfg)
+	err = env.Parse(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse config from env: %w", err)
 	}

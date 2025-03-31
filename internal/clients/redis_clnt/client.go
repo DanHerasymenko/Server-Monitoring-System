@@ -1,19 +1,22 @@
 package redis_clnt
 
-import "github.com/redis/go-redis/v9"
+import (
+	"Server-Monitoring-System/internal/config"
+	"github.com/redis/go-redis/v9"
+)
 
 type Client struct {
 	Redis *redis.Client
 }
 
-func NewRedisClient(addr, password string, db int) (*Client, error) {
+func NewRedisClient(cfg *config.Config) *Client {
 
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       db,
+		Addr:     cfg.RedisURL,
+		Password: cfg.RedisPassword,
+		DB:       cfg.RedisDB,
 	})
 
-	return &Client{Redis: client}, nil
+	return &Client{Redis: client}
 
 }
