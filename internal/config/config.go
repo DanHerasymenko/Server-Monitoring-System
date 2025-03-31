@@ -20,9 +20,11 @@ type Config struct {
 	AgentIP                string `env:"AGENT_IP" envDefault:"localhost"`
 	AgentPort              string `env:"AGENT_PORT" envDefault:"50052"`
 	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"20"`
-	RedisURL               string `env:"REDIS_URL" envDefault:"localhost:6380"`
-	RedisPassword          string `env:"REDIS_PASSWORD" envDefault:""`
-	RedisDB                int    `env:"REDIS_DB" envDefault:"0"`
+	RedisAddr              string `env:"REDIS_ADDR" envDefault:"localhost:6379"`
+	RedisPassword          string `env:"REDIS_PASSWORD"`
+	RedisUser              string `env:"REDIS_USER"`
+	RedisUserPassword      string `env:"REDIS_USER_PASSWORD"`
+	RedisDB                int    `env:"REDIS_DB"`
 }
 
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {

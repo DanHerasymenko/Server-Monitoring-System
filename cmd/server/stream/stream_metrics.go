@@ -20,12 +20,6 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 
 	ctx := stream.Context()
 
-	if err := s.Services.RedisS.Ping(ctx); err != nil {
-		logger.Error(ctx, err)
-	} else if err == nil {
-		logger.Info(ctx, "Redis ping successful")
-	}
-
 	for {
 		req, err := stream.Recv()
 		if err == io.EOF {
@@ -48,6 +42,7 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 		err = s.Services.RedisS.SaveMetrics(ctx, req.ServerIp, req)
 		if err != nil {
 			logger.Error(ctx, fmt.Errorf("failed to save metrics after receiving: %w", err))
+			return err
 		}
 		logger.Info(ctx, "Metrics saved successfully")
 
