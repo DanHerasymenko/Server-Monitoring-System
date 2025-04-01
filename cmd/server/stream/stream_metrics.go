@@ -39,18 +39,15 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 			slog.Int64("timestamp", req.Timestamp),
 		)
 
-		err = s.Services.RedisS.SaveMetrics(ctx, req.ServerIp, req)
+		err = s.Services.RedisS.SaveMetrics(ctx, req)
 		if err != nil {
 			logger.Error(ctx, fmt.Errorf("failed to save metrics after receiving: %w", err))
 			return err
 		}
-		logger.Info(ctx, "Metrics saved successfully")
+		logger.Info(ctx, "Metrics saved to Redis successfully")
 
-		metricsbyIP, err := s.Services.RedisS.GetMetricsByIp(ctx, req.ServerIp)
-		fmt.Println(metricsbyIP)
-
-		allMetrics, err := s.Services.RedisS.GetAllMetrics(ctx)
-		fmt.Println(allMetrics)
+		// metricsByIP, err := s.Services.RedisS.GetMetricsByIp(ctx, req.ServerIp)
+		// allMetrics, err := s.Services.RedisS.GetAllMetrics(ctx)
 
 		// Send response back to client
 		resp := &pb.MetricsResponse{Status: "Metrics received"}

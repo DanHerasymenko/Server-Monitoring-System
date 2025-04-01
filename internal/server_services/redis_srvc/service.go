@@ -3,6 +3,7 @@ package redis_srvc
 import (
 	"Server-Monitoring-System/internal/clients"
 	"Server-Monitoring-System/internal/config"
+	"Server-Monitoring-System/internal/logger"
 	pb "Server-Monitoring-System/proto"
 	"context"
 	"fmt"
@@ -28,9 +29,9 @@ func (srvs *Service) Ping(ctx context.Context) error {
 	return nil
 }
 
-func (srvs *Service) SaveMetrics(ctx context.Context, agentIP string, metrics *pb.MetricsRequest) error {
+func (srvs *Service) SaveMetrics(ctx context.Context, metrics *pb.MetricsRequest) error {
 
-	key := fmt.Sprintf("metrics:%s", agentIP)
+	key := fmt.Sprintf("metrics:%s", metrics.ServerIp)
 	value := map[string]interface{}{
 		"cpu":       metrics.CpuUsage,
 		"ram":       metrics.RamUsage,
@@ -63,43 +64,55 @@ func (srvs *Service) GetMetricsByIp(ctx context.Context, agentIP string) (*pb.Me
 }
 
 func (srvs *Service) GetAllMetrics(ctx context.Context) (map[string]*pb.MetricsRequest, error) {
-
 	var (
 		cursor        uint64
 		allKeys       []string
 		allMetricsMap = make(map[string]*pb.MetricsRequest)
 	)
 
-	// scan all keys with pattern "metrics:*" and 100 keys for 1 iteration - use scan to not block
+	// scan all keys with pattern "metrics:*" and 100 keys for 1 iteration
 	for {
-
-		keys, cursor, err := srvs.clnts.RedisClnt.Redis.Scan(ctx, cursor, "metrics:*", 100).Result()
-
+		keys, nextCursor, err := srvs.clnts.RedisClnt.Redis.Scan(ctx, cursor, "metrics:*", 100).Result()
 		if err != nil {
-			fmt.Errorf("failed to scan keys: %w", err)
+			logger.Error(ctx, fmt.Errorf("failed to scan keys: %w", err))
+			return nil, err
 		}
+
+		allKeys = append(allKeys, keys...)
+		cursor = nextCursor
 
 		if cursor == 0 {
 			break
 		}
-
-		allKeys = append(allKeys, keys...)
 	}
 
-	// get all metrics for each key
-	for _, key := range allKeys {
+	if len(allKeys) == 0 {
+		logger.Warn(ctx, "No metrics keys found in Redis")
+		return allMetricsMap, nil
+	}
 
+	for _, key := range allKeys {
 		ip := strings.TrimPrefix(key, "metrics:")
-		data, err := srvs.clnts.RedisClnt.Redis.HGetAll(ctx, ip).Result()
+
+		data, err := srvs.clnts.RedisClnt.Redis.HGetAll(ctx, key).Result()
 		if err != nil {
-			return nil, fmt.Errorf("failed to get all metrics: %w", err)
-		} else if len(data) == 0 {
-			return nil, fmt.Errorf("no metrics found: %s", ip)
+			logger.Error(ctx, fmt.Errorf("failed to get metrics for key %s: %w", key, err))
+			continue
 		}
 
-		allMetricsMap[ip], err = ConvertRedisDataToMetrics(ip, data)
+		if len(data) == 0 {
+			logger.Warn(ctx, fmt.Sprintf("No data found for key: %s", key))
+			continue
+		}
+
+		metrics, err := ConvertRedisDataToMetrics(ip, data)
+		if err != nil {
+			logger.Error(ctx, fmt.Errorf("failed to convert redis data for %s: %w", ip, err))
+			continue
+		}
+
+		allMetricsMap[ip] = metrics
 	}
 
 	return allMetricsMap, nil
-
 }
