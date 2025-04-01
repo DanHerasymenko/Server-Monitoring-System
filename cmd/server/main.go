@@ -31,18 +31,13 @@ func main() {
 	}
 
 	// initialize clients
-	clnts, err := clients.NewClients(cfg)
+	clnts, err := clients.NewClients(ctx, cfg)
 	if err != nil {
 		logger.Fatal(ctx, fmt.Errorf("failed to initialize clients: %w", err))
 	}
 
 	// initialize services
 	srvc := server_services.NewServices(cfg, clnts)
-
-	// check Redis connection
-	if err := srvc.RedisS.PingCheck(ctx); err != nil {
-		logger.Fatal(ctx, fmt.Errorf("failed to ping Redis: %w", err))
-	}
 
 	// listen on port 50051
 	lis, err := net.Listen("tcp", ":50051")

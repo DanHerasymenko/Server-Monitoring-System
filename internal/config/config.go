@@ -19,12 +19,17 @@ type Config struct {
 	ServerPort             string `env:"SERVER_PORT" envDefault:"50051"`
 	AgentIP                string `env:"AGENT_IP" envDefault:"localhost"`
 	AgentPort              string `env:"AGENT_PORT" envDefault:"50052"`
-	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"20"`
+	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"30"`
 	RedisAddr              string `env:"REDIS_ADDR" envDefault:"localhost:6379"`
 	RedisPassword          string `env:"REDIS_PASSWORD"`
 	RedisUser              string `env:"REDIS_USER"`
 	RedisUserPassword      string `env:"REDIS_USER_PASSWORD"`
 	RedisDB                int    `env:"REDIS_DB"`
+	PostgresHost           string `env:"POSTGRES_HOST" envDefault:"localhost"`
+	PostgresPort           int    `env:"POSTGRES_PORT" envDefault:"5432"`
+	PostgresUser           string `env:"POSTGRES_USER"`
+	PostgresPassword       string `env:"POSTGRES_PASSWORD"`
+	PostgresDB             string `env:"POSTGRES_DB"`
 }
 
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {
