@@ -18,6 +18,8 @@ import (
 	"syscall"
 )
 
+// simlulate agent with `grpcui.exe -plaintext localhost:50051`
+
 func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
