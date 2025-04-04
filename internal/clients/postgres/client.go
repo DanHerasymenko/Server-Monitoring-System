@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"Server-Monitoring-System/internal/config"
+	"Server-Monitoring-System/internal/logger"
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -21,9 +22,6 @@ func NewPostgresClient(ctx context.Context, cfg *config.Config) (*Client, error)
 		cfg.PostgresPort,
 		cfg.PostgresDB,
 	)
-	fmt.Println("DSN", dsn)
-	fmt.Println("PG user:", cfg.PostgresUser)
-	fmt.Println("PG pass:", cfg.PostgresPassword)
 
 	poolConfig, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -40,6 +38,8 @@ func NewPostgresClient(ctx context.Context, cfg *config.Config) (*Client, error)
 		pool.Close()
 		return nil, fmt.Errorf("failed to ping pool: %w", err)
 	}
+
+	logger.Info(ctx, "Postgres ping successful")
 
 	return &Client{Pool: pool}, nil
 }

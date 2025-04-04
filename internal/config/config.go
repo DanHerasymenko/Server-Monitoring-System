@@ -20,13 +20,13 @@ type Config struct {
 	AgentIP                string `env:"AGENT_IP" envDefault:"localhost"`
 	AgentPort              string `env:"AGENT_PORT" envDefault:"50052"`
 	CollectMetricsInterval int    `env:"COLLECT_METRICS_INTERVAL" envDefault:"30"`
-	RedisAddr              string `env:"REDIS_ADDR" envDefault:"localhost:6379"`
+	RedisAddr              string `env:"REDIS_ADDR"`
 	RedisPassword          string `env:"REDIS_PASSWORD"`
 	RedisUser              string `env:"REDIS_USER"`
 	RedisUserPassword      string `env:"REDIS_USER_PASSWORD"`
 	RedisDB                int    `env:"REDIS_DB"`
-	PostgresHost           string `env:"POSTGRES_HOST" envDefault:"localhost"`
-	PostgresPort           int    `env:"POSTGRES_PORT" envDefault:"5432"`
+	PostgresHost           string `env:"POSTGRES_HOST"`
+	PostgresPort           int    `env:"POSTGRES_PORT"`
 	PostgresUser           string `env:"POSTGRES_USER"`
 	PostgresPassword       string `env:"POSTGRES_PASSWORD"`
 	PostgresDB             string `env:"POSTGRES_DB"`
@@ -34,7 +34,7 @@ type Config struct {
 
 func NewConfigFromEnv(ctx context.Context) (*Config, error) {
 
-	//// read explicitly from .env file
+	// read explicitly from .env file
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)

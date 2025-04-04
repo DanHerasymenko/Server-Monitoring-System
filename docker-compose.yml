@@ -21,18 +21,21 @@ services:
     stdin_open: true
 
   postgres:
-    image: postgres:15
+    image: postgres:17.4
     container_name: postgres_container
     restart: no
     environment:
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - ${POSTGRES_PORT}:5432
     volumes:
       - ./pgdata:/var/lib/postgresql/data
-      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U monitoring_user -d monitoring_db" ]
       interval: 10s
       timeout: 5s
       retries: 5
+    tty: true
+    stdin_open: true
