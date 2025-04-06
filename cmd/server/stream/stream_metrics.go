@@ -12,8 +12,9 @@ import (
 
 type Server struct {
 	pb.UnimplementedMonitoringServiceServer
-	Clients  *clients.Clients
-	Services *server_services.Services
+	Clients     *clients.Clients
+	Services    *server_services.Services
+	MetricQueue chan *pb.MetricsRequest
 }
 
 func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) error {
@@ -45,6 +46,12 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 			return err
 		}
 		logger.Info(ctx, "Metrics saved to Redis successfully")
+
+		// Send metrics to the queue
+		logger.Info(ctx, "Before queue")
+		s.MetricQueue <- req
+		logger.Info(ctx, "After queue")
+		logger.Info(ctx, fmt.Sprintf("%v", s.MetricQueue))
 
 		// metricsByIP, err := s.Services.RedisS.GetMetricsByIp(ctx, req.ServerIp)
 		// allMetrics, err := s.Services.RedisS.GetAllMetrics(ctx)

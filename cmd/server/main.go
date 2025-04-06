@@ -19,6 +19,7 @@ import (
 )
 
 // simlulate agent with `grpcui.exe -plaintext localhost:50051`
+// configure workers settings in constants
 
 func main() {
 
@@ -41,6 +42,10 @@ func main() {
 	// initialize services
 	srvc := server_services.NewServices(cfg, clnts)
 
+	// start workers
+	queue := srvc.Postgres.NewServerMetricsQueue()
+	srvc.Postgres.StartWorkerPool(ctx, queue)
+
 	// listen on port 50051
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
@@ -53,8 +58,9 @@ func main() {
 
 	// register the server_services with the gRPC server_services
 	pb.RegisterMonitoringServiceServer(grpcServer, &stream.Server{
-		Clients:  clnts,
-		Services: srvc,
+		Clients:     clnts,
+		Services:    srvc,
+		MetricQueue: queue.MetricQueue,
 	})
 
 	lisAddrStr := lis.Addr().String()
