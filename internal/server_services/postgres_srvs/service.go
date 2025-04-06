@@ -1,4 +1,4 @@
-package metrics
+package postgres_srvs
 
 import (
 	"Server-Monitoring-System/internal/clients"

@@ -27,7 +27,7 @@ go.mod
 #IDE dir
 .idea/
 
-/pgdata
+/db/pgdata/
 
 *.env
 
