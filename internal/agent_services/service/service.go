@@ -32,6 +32,7 @@ func NewService(cfg *config.Config, ctx context.Context, cancel context.CancelFu
 func (s *Service) Stop(svc service.Service) error {
 
 	s.cancel()
+	logger.Info(s.context, "Agent is stopped")
 	return nil
 }
 

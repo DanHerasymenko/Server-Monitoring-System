@@ -25,7 +25,6 @@ func main() {
 
 	// new gRPC connection to server without TLS
 	serverAddr := cfg.ServerIP + ":" + cfg.ServerPort
-	fmt.Println(serverAddr)
 	conn, err := grpc.NewClient(serverAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		logger.Fatal(ctx, fmt.Errorf("failed to connect to server: %w", err))
