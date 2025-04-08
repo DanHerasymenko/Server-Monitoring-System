@@ -49,7 +49,7 @@ func init() {
 
 		// Set up log rotation
 		logFile = &lumberjack.Logger{
-			Filename:   filepath.Join(logDir, "monitoring_agent.log"),
+			Filename:   filepath.Join(logDir, "monitoring.log"),
 			MaxSize:    10, // Max size in MB
 			MaxBackups: 3,  // Max backup files
 			MaxAge:     7,  // Max days before rotation

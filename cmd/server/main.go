@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Server-Monitoring-System/cmd/server/metrics"
 	"Server-Monitoring-System/cmd/server/stream"
 	"Server-Monitoring-System/internal/clients"
 	"Server-Monitoring-System/internal/config"
@@ -74,6 +75,9 @@ func main() {
 		}
 	}()
 	logger.Info(ctx, "Server started")
+
+	// start metrics server
+	metrics.StartMetricsServer(ctx)
 
 	// graceful shutdown
 	sigChan := make(chan os.Signal, 1)
