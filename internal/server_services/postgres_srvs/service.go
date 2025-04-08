@@ -48,7 +48,6 @@ func (srvs *Service) SaveBatchMetricsToPostgres(ctx context.Context, batch []*pb
 		}
 
 		// insert metrics
-		logger.Info(ctx, "Inserting metrics")
 		_, err = tx.Exec(ctx, `INSERT INTO metrics (server_id, cpu_usage, ram_usage, disk_usage, timestamp) VALUES ($1, $2, $3, $4, $5) ON CONFLICT DO NOTHING`,
 			serverId, m.CpuUsage, m.RamUsage, m.DiskUsage, m.Timestamp)
 		if err != nil {

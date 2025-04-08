@@ -5,6 +5,7 @@ import (
 	"Server-Monitoring-System/internal/logger"
 	"Server-Monitoring-System/internal/server_services"
 	pb "Server-Monitoring-System/proto"
+	"context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -15,24 +16,24 @@ type Server struct {
 	Clients     *clients.Clients
 	Services    *server_services.Services
 	MetricQueue chan *pb.MetricsRequest
+	Ctx         context.Context
 }
 
 func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) error {
 
-	ctx := stream.Context()
-
 	for {
+		// Receive metrics from the client
 		req, err := stream.Recv()
 		if err == io.EOF {
-			logger.Info(ctx, "Client closed the stream")
+			logger.Info(s.Ctx, "Client closed the stream")
 			return nil
 		}
 		if err != nil {
-			logger.Error(ctx, fmt.Errorf("failed to receive metrics: %w", err))
+			logger.Error(s.Ctx, fmt.Errorf("failed to receive metrics: %w", err))
 			return err
 		}
 
-		logger.Info(ctx, "Server received metrics",
+		logger.Info(s.Ctx, "Server received metrics",
 			slog.String("server_ip", req.ServerIp),
 			slog.Float64("cpu", req.CpuUsage),
 			slog.Float64("ram", req.RamUsage),
@@ -40,26 +41,25 @@ func (s *Server) StreamMetrics(stream pb.MonitoringService_StreamMetricsServer) 
 			slog.Int64("timestamp", req.Timestamp),
 		)
 
-		err = s.Services.RedisS.SaveMetrics(ctx, req)
+		// Save metrics to Postgres
+		err = s.Services.RedisS.SaveMetrics(s.Ctx, req)
 		if err != nil {
-			logger.Error(ctx, fmt.Errorf("failed to save metrics after receiving: %w", err))
+			logger.Error(s.Ctx, fmt.Errorf("failed to save metrics after receiving: %w", err))
 			return err
 		}
-		logger.Info(ctx, "Metrics saved to Redis successfully")
+		logger.Info(s.Ctx, "Metrics saved to Redis successfully")
 
-		// Send metrics to the queue
-		logger.Info(ctx, "Before queue")
-		s.MetricQueue <- req
-		logger.Info(ctx, "After queue")
-		logger.Info(ctx, fmt.Sprintf("%v", s.MetricQueue))
-
-		// metricsByIP, err := s.Services.RedisS.GetMetricsByIp(ctx, req.ServerIp)
-		// allMetrics, err := s.Services.RedisS.GetAllMetrics(ctx)
+		// Add metrics to the queue with timeout
+		err = s.Services.Postgres.AddMetricsToQueueWithTimeout(s.MetricQueue, req)
+		if err != nil {
+			logger.Error(s.Ctx, fmt.Errorf("failed to add metrics to queue: %w", err))
+			return err
+		}
 
 		// Send response back to client
-		resp := &pb.MetricsResponse{Status: "Metrics received"}
+		resp := &pb.MetricsResponse{Status: "Metrics received on the server"}
 		if err := stream.Send(resp); err != nil {
-			logger.Error(ctx, fmt.Errorf("failed to send response: %w", err))
+			logger.Error(s.Ctx, fmt.Errorf("failed to send response: %w", err))
 			return err
 		}
 	}

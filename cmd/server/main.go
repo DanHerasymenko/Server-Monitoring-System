@@ -61,6 +61,7 @@ func main() {
 		Clients:     clnts,
 		Services:    srvc,
 		MetricQueue: queue.MetricQueue,
+		Ctx:         ctx,
 	})
 
 	lisAddrStr := lis.Addr().String()

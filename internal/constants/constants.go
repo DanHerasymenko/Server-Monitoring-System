@@ -11,5 +11,6 @@ const (
 	WorkerCount        = 5
 	WorkerBatchSize    = 100
 	WorkerFlushTimeout = 5 * time.Second
-	WorkerQueueSize    = 10000
+	MetricQueueSize    = 10000
+	MetricQueueTimeout = 10 * time.Second
 )
