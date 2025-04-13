@@ -7,19 +7,24 @@ import (
 	"time"
 )
 
-type ServerWorker struct {
-	MetricQueue chan *pb.MetricsRequest
+type MetricsItem struct {
+	Metric     *pb.MetricsRequest
+	EnqueuedAt time.Time
 }
 
-func (srvs *Service) NewServerMetricsQueue() *ServerWorker {
+type ServerWorker struct {
+	MetricQueue chan MetricsItem
+}
+
+func (srvs *Service) NewServerWorker() *ServerWorker {
 	return &ServerWorker{
-		MetricQueue: make(chan *pb.MetricsRequest, constants.MetricQueueSize),
+		MetricQueue: make(chan MetricsItem, constants.MetricQueueSize),
 	}
 }
 
-func (srvs *Service) AddMetricsToQueueWithTimeout(metricQueue chan *pb.MetricsRequest, req *pb.MetricsRequest) error {
+func (srvs *Service) AddMetricsToQueueWithTimeout(metricQueue chan MetricsItem, metricsItem MetricsItem) error {
 	select {
-	case metricQueue <- req:
+	case metricQueue <- metricsItem:
 		return nil
 	case <-time.After(constants.MetricQueueTimeout):
 		return fmt.Errorf("timeout after %v", constants.MetricQueueTimeout)

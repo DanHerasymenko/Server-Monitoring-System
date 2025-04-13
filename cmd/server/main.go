@@ -44,7 +44,7 @@ func main() {
 	srvc := server_services.NewServices(cfg, clnts)
 
 	// start workers
-	queue := srvc.Postgres.NewServerMetricsQueue()
+	queue := srvc.Postgres.NewServerWorker()
 	srvc.Postgres.StartWorkerPool(ctx, queue)
 
 	// listen on port 50051
@@ -67,6 +67,10 @@ func main() {
 
 	lisAddrStr := lis.Addr().String()
 
+	// start metrics server
+	metrics.StartMetricsServer(ctx)
+	logger.Info(ctx, "Metrics server started")
+
 	// start the server_services
 	logger.Info(ctx, "Starting server_services...", slog.String("address", lisAddrStr))
 	go func() {
@@ -75,9 +79,6 @@ func main() {
 		}
 	}()
 	logger.Info(ctx, "Server started")
-
-	// start metrics server
-	metrics.StartMetricsServer(ctx)
 
 	// graceful shutdown
 	sigChan := make(chan os.Signal, 1)

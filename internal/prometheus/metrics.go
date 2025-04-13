@@ -17,7 +17,7 @@ var MetricsReceivedTotal = promauto.NewCounter(prometheus.CounterOpts{
 
 var DBWriteDuration = promauto.NewHistogram(prometheus.HistogramOpts{
 	Name:    "sms_db_write_duration_seconds",
-	Help:    "Duration of PostgreSQL write operations in seconds",
+	Help:    "Duration of PostgreSQL write operations in seconds: receive metric from agent -> saving to DB",
 	Buckets: prometheus.DefBuckets,
 })
 
